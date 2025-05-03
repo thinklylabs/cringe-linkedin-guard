@@ -53,10 +53,27 @@ function updateCringeStats(postText) {
     });
 }
 
-function cringeGuardThisPost(post) {
+function cringeGuardThisPost(post, filterMode) {
     const parentDiv = post.closest('.feed-shared-update-v2__control-menu-container');
 
     if (parentDiv) {
+        // completely hiding the post from DOM if filterMode is 'remove'
+        if (filterMode === 'remove') { // TODO - refactor is needed here.
+            const postContainer = parentDiv.closest('.feed-shared-update-v2');
+
+            if (postContainer) {
+                postContainer.style.display = 'none';
+                postContainer.style.visibility = 'hidden';
+                postContainer.style.height = '0';
+                postContainer.style.overflow = 'hidden';
+                postContainer.style.margin = '0';
+                postContainer.style.padding = '0';
+                postContainer.style.opacity = '0';
+                postContainer.style.pointerEvents = 'none'; // Prevents interaction
+            }
+            console.log('[Cringe Guard] Post removed');
+            return;
+        }
         const wrapper = document.createElement('div');
         while (parentDiv.firstChild) {
             wrapper.appendChild(parentDiv.firstChild);
@@ -164,7 +181,13 @@ async function checkForCringe(post) {
         const data = await response.json();
         const isCringe = data.choices[0].message.content.toLowerCase().includes('post_is_cringe');
         if (isCringe) {
-            cringeGuardThisPost(post);
+            const { filterMode } = await new Promise(resolve => {
+                chrome.storage.sync.get(['filterMode'], data => {
+                    resolve({ filterMode: data.filterMode || 'blur' }); // Defaulting to 'blur' if not set
+                });
+            });
+
+            cringeGuardThisPost(post, filterMode);
             updateCringeStats(post.innerText);
         }
         return isCringe;
