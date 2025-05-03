@@ -14,7 +14,9 @@ The cringe-guard Chrome extension filters out cringe content from your LinkedIn 
 
 1. **Detects New Posts**: As new posts appear in your feed, the extension detects them in real time.
 2. **Sends for Analysis**: The post content is sent to an AI model (via an API) that classifies it based on predefined "cringe" criteria (e.g., engagement bait, overly promotional content, etc.).
-3. **Applies Blur**: Posts identified as cringe are blurred to keep your feed cleaner and more relevant.
+3. **Filters Content**: Posts identified as cringe are filtered according to your preferred mode:
+    - Blur Mode: Blurs cringe until you decide (with a "Click to View" option)
+    - Vanish Mode: Vanish cringe completely from your feed
 4. **User Control**: Users can customize the types of posts they want to see and hide, and control their settings (like 
 API keys) via modifying `content.js`.
 
@@ -30,15 +32,15 @@ To run the Cringe-Guard Chrome extension on your local machine, follow these ste
 - Select the folder where the extension files are located (`cringe-guard` folder).
 
 ## TODO
-- Refactor the codebase a bit
-- Allow users to input API key through a simple interface in popup.html.
-- Provide users with the option to either blur or completely remove content from the DOM.
-- In addition to analyzing the text content of posts, automatically detect and remove posts with "Promoted" tags by default.
-- Enable custom post filters, letting users choose which posts to show or hide via UI
-- Persist user settings (API key and filters) using Chrome Storage API.
-- Test cross-browser compatibility
-- Bug: The extension is unexpectedly logging `GET chrome-extension://invalid/ net::ERR_FAILED` in the console for some reason.
-- Redesign the logo to better reflect the purpose of the extension
+- [ ] Refactor the codebase a bit
+- [x] Allow users to input API key through a simple interface in popup.html.
+- [x] Provide users with the option to either blur or completely remove content from the DOM.
+- [ ] In addition to analyzing the text content of posts, automatically detect and remove posts with "Promoted" tags by default.
+- [ ] Enable custom post filters, letting users choose which posts to show or hide via UI
+- [x] Persist user settings (API key and filters) using Chrome Storage API.
+- [ ] Test cross-browser compatibility
+- [ ] Bug: The extension is unexpectedly logging `GET chrome-extension://invalid/ net::ERR_FAILED` in the console for some reason.
+- [ ] Redesign the logo to better reflect the purpose of the extension
 
 ## Built with ❤️ by
 
