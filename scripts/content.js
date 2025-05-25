@@ -127,7 +127,11 @@ function cringeGuardThisPost(post, filterMode) {
     }
 }
 
-async function checkForCringe(post) {
+async function checkForCringe({ actorName, actorDescription, actorSubDescription, postContent }) {
+    // Cringe Rule: 0 - No Promoted Posts.
+    if (actorDescription.toLowerCase().includes('promoted') || actorSubDescription.toLowerCase().includes('promoted')) {
+        return true;
+    }
     const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
     const apiKey = await getApiKeyIfEnabled();
     if (!apiKey) return; // Stop execution if no API key
@@ -172,7 +176,7 @@ async function checkForCringe(post) {
                 model: "gemma2-9b-it",
                 messages: [
                     { role: "system", content: prompt },
-                    { role: "user", content: "Linkedin Post:\n\n" + post.innerText.trim() + "\n\nVery briefly list if the post matches any of the defined cringe criteria. If none, conclude with POST_IS_NOT_CRINGE otherwise POST_IS_CRINGE." }
+                    { role: "user", content: "Linkedin Post:\n\n" + postContent + "\n\nVery briefly list if the post matches any of the defined cringe criteria. If none, conclude with POST_IS_NOT_CRINGE otherwise POST_IS_CRINGE." }
                 ],
                 temperature: 0.1 // Lowering temperature for more consistent responses
             })
@@ -180,6 +184,49 @@ async function checkForCringe(post) {
 
         const data = await response.json();
         const isCringe = data.choices[0].message.content.toLowerCase().includes('post_is_cringe');
+        return isCringe;
+    } catch (error) {
+        console.error('Error checking post:', error);
+        return false;
+    }
+}
+
+const alreadyProcessedPosts = new Set();
+async function processPost(post) {
+    const commentaryElement = post.querySelector('.update-components-update-v2__commentary');
+    if (commentaryElement && !alreadyProcessedPosts.has(commentaryElement)) {
+        alreadyProcessedPosts.add(commentaryElement);
+        const actorContainer = post.querySelector('.update-components-actor__container');
+
+        // Post metadata
+        let actorName = 'Unknown';
+        let actorDescription = 'No description';
+        let actorSubDescription = 'No sub-description';
+
+        if (actorContainer) {
+            const nameElement = actorContainer.querySelector('.update-components-actor__title .KGgIHqzHPPknyAatueAITVWiujbQjSvZMsjyU span[aria-hidden="true"]');
+            if (nameElement) {
+                actorName = nameElement.textContent.trim();
+            }
+
+            const descriptionElement = actorContainer.querySelector('.update-components-actor__description span[aria-hidden="true"]');
+            if (descriptionElement) {
+                actorDescription = descriptionElement.textContent.trim();
+            }
+
+            const subDescriptionElement = actorContainer.querySelector('.update-components-actor__sub-description span[aria-hidden="true"]');
+            if (subDescriptionElement) {
+                actorSubDescription = subDescriptionElement.textContent.trim();
+            }
+        }
+
+        const isCringe = await checkForCringe({
+            actorName,
+            actorDescription,
+            actorSubDescription,
+            postContent: commentaryElement.innerText.trim(),
+        });
+
         if (isCringe) {
             const { filterMode } = await new Promise(resolve => {
                 chrome.storage.sync.get(['filterMode'], data => {
@@ -190,37 +237,26 @@ async function checkForCringe(post) {
             cringeGuardThisPost(post, filterMode);
             updateCringeStats(post.innerText);
         }
-        return isCringe;
-    } catch (error) {
-        console.error('Error checking post:', error);
-        return false;
     }
 }
 
-const debouncedCheckForCringe = debounce(checkForCringe, 1000);
-
 function cringeGuardExistingPosts() {
-    const posts = document.querySelectorAll('.update-components-update-v2__commentary');
+    const posts = document.querySelectorAll('.feed-shared-update-v2__control-menu-container');
     for (const post of posts) {
-        debouncedCheckForCringe(post);
+        processPost(post);
     }
 }
 
 function observeNewPosts() {
-    const alreadyProcessedPosts = new Set();
-
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.type === 'childList') {
                 mutation.addedNodes.forEach((node) => {
                     if (node.nodeType === Node.ELEMENT_NODE) {
-                        const posts = node.querySelectorAll('.update-components-update-v2__commentary');
-                        for (const post of posts) {
-                            if (!alreadyProcessedPosts.has(post)) {
-                                alreadyProcessedPosts.add(post);
-                                checkForCringe(post);
-                            }
-                        }
+                        const postContainers = node.querySelectorAll('.feed-shared-update-v2__control-menu-container');
+                        postContainers.forEach((postContainer) => {
+                            processPost(postContainer);
+                        })
                     }
                 });
             }
