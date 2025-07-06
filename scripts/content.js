@@ -11,6 +11,21 @@ function getApiKeyIfEnabled() {
     });
 }
 
+function getMutedWords() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get(["mutedWords"], (data) => {
+            resolve(data.mutedWords || []);
+        });
+    });
+}
+
+function containsMutedWords(text, mutedWords) {
+    if (!mutedWords || mutedWords.length === 0) return false;
+
+    const lowerText = text.toLowerCase();
+    return mutedWords.some(word => lowerText.includes(word.toLowerCase()));
+}
+
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -132,6 +147,13 @@ async function checkForCringe({ actorName, actorDescription, actorSubDescription
     if (actorDescription.toLowerCase().includes('promoted') || actorSubDescription.toLowerCase().includes('promoted')) {
         return true;
     }
+
+    // Cringe Rule: 1 - Contains muted words.
+    const mutedWords = await getMutedWords();
+    if (containsMutedWords(actorName, mutedWords) || containsMutedWords(actorDescription, mutedWords) || containsMutedWords(actorSubDescription, mutedWords) || containsMutedWords(postContent, mutedWords)) {
+        return true;
+    }
+
     const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
     const apiKey = await getApiKeyIfEnabled();
     if (!apiKey) return; // Stop execution if no API key
@@ -183,6 +205,10 @@ async function checkForCringe({ actorName, actorDescription, actorSubDescription
         });
 
         const data = await response.json();
+        if(data.error) {
+            return false; // If there's an error, we skip
+        }
+
         const isCringe = data.choices[0].message.content.toLowerCase().includes('post_is_cringe');
         return isCringe;
     } catch (error) {
