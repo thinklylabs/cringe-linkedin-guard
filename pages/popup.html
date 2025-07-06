@@ -309,6 +309,177 @@
         .toggle-option svg {
             stroke-width: 2.5;
         }
+
+        /* Mute Words Section */
+        .mute-words-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .mute-words-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .mute-words-title {
+            font-weight: bold;
+            color: #0077b5;
+        }
+
+        .mute-words-count {
+            font-size: 12px;
+            color: #64748b;
+            background: #f1f6f9;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .mute-input-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mute-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .mute-input:focus {
+            border-color: #0077b5;
+            box-shadow: 0 0 0 2px rgba(0, 119, 181, 0.1);
+        }
+
+        .add-word-btn {
+            background: #0077b5;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .add-word-btn:hover {
+            background: #004182;
+        }
+
+        .add-word-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .muted-words-container {
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 2px;
+        }
+
+        .muted-words-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .muted-word-tag {
+            background: #f1f6f9;
+            color: #0077b5;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #e1f0f7;
+            transition: all 0.2s;
+        }
+
+        .muted-word-tag:hover {
+            background: #e1f0f7;
+            transform: translateY(-1px);
+        }
+
+        .remove-word-btn {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .remove-word-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border: 1px dashed #e5e7eb;
+        }
+
+        .clear-all-btn {
+            background: none;
+            border: 1px solid #e5e7eb;
+            color: #64748b;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .clear-all-btn:hover {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .muted-words-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .muted-words-container::-webkit-scrollbar-track {
+            background: #f1f6f9;
+            border-radius: 2px;
+        }
+
+        .muted-words-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        .muted-words-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
 
@@ -387,6 +558,44 @@
                 </div>
                 <div class="mode-description" id="mode-description">
                     Blurs cringe until you decide
+                </div>
+            </div>
+
+            <!-- Mute Words Section -->
+            <div class="mute-words-section">
+                <div class="mute-words-header">
+                    <div class="mute-words-title">Mute Words</div>
+                    <div class="mute-words-count" id="mute-count">0 words</div>
+                </div>
+
+                <div class="mute-input-container">
+                    <input type="text" class="mute-input" id="mute-input" placeholder="Add word to mute..."
+                        maxlength="30">
+                    <button class="add-word-btn" id="add-word-btn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add
+                    </button>
+                </div>
+
+                <div class="muted-words-container" id="muted-words-container">
+                    <div class="muted-words-list" id="muted-words-list"></div>
+                    <div class="empty-state" id="empty-state">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" style="margin-bottom: 8px; opacity: 0.5;">
+                            <path d="M9 12l2 2 4-4" />
+                            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
+                        </svg>
+                        <div>No muted words yet</div>
+                        <div style="margin-top: 4px; font-size: 11px; opacity: 0.7;">Add words to automatically filter
+                            posts</div>
+                    </div>
+                    <button class="clear-all-btn" id="clear-all-btn" style="display: none;">
+                        Clear All Words
+                    </button>
                 </div>
             </div>
         </div>

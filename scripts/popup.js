@@ -72,4 +72,110 @@ document.addEventListener("DOMContentLoaded", function () {
     settingsButton.addEventListener('click', () => {
         chrome.runtime.openOptionsPage();
     });
+
+    // Mute words functionality
+    let mutedWords = [];
+
+    function loadMutedWords() {
+        chrome.storage.sync.get(['mutedWords'], (data) => {
+            mutedWords = data.mutedWords || [];
+            updateMutedWordsDisplay();
+        });
+    }
+
+    function saveMutedWords() {
+        chrome.storage.sync.set({ mutedWords: mutedWords });
+    }
+
+    function updateMutedWordsDisplay() {
+        const container = document.getElementById('muted-words-list');
+        const emptyState = document.getElementById('empty-state');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const muteCount = document.getElementById('mute-count');
+
+        muteCount.textContent = `${mutedWords.length} word${mutedWords.length !== 1 ? 's' : ''}`;
+
+        if (mutedWords.length === 0) {
+            container.style.display = 'none';
+            emptyState.style.display = 'block';
+            clearAllBtn.style.display = 'none';
+        } else {
+            container.style.display = 'flex';
+            emptyState.style.display = 'none';
+            clearAllBtn.style.display = 'block';
+
+            container.innerHTML = '';
+            mutedWords.forEach((word, index) => {
+                const wordTag = document.createElement('div');
+                wordTag.className = 'muted-word-tag';
+                wordTag.innerHTML = `
+                    <span>${word}</span>
+                    <button class="remove-word-btn">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                `;
+
+                const removeBtn = wordTag.querySelector('.remove-word-btn');
+                removeBtn.addEventListener('click', () => removeMutedWord(index));
+
+                container.appendChild(wordTag);
+            });
+        }
+    }
+
+    function addMutedWord() {
+        const input = document.getElementById('mute-input');
+        const word = input.value.trim().toLowerCase();
+
+        if (word && !mutedWords.includes(word) && mutedWords.length < 20) {
+            mutedWords.push(word);
+            saveMutedWords();
+            updateMutedWordsDisplay();
+            input.value = '';
+            updateAddButtonState();
+        }
+    }
+
+    function removeMutedWord(index) {
+        console.log(`Removing muted word at index ${index}`);
+        mutedWords.splice(index, 1);
+        saveMutedWords();
+        updateMutedWordsDisplay();
+        updateAddButtonState();
+    }
+
+    function clearAllMutedWords() {
+        mutedWords = [];
+        saveMutedWords();
+        updateMutedWordsDisplay();
+        updateAddButtonState();
+    }
+
+    function updateAddButtonState() {
+        const input = document.getElementById('mute-input');
+        const addBtn = document.getElementById('add-word-btn');
+        const word = input.value.trim().toLowerCase();
+
+        const isValid = word && !mutedWords.includes(word) && mutedWords.length < 20;
+        addBtn.disabled = !isValid;
+    }
+
+    // Event listeners
+    document.getElementById('add-word-btn').addEventListener('click', addMutedWord);
+    document.getElementById('clear-all-btn').addEventListener('click', clearAllMutedWords);
+
+    const muteInput = document.getElementById('mute-input');
+    muteInput.addEventListener('input', updateAddButtonState);
+    muteInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            addMutedWord();
+        }
+    });
+
+    // Initialize
+    loadMutedWords();
+    updateAddButtonState();
 });

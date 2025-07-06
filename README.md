@@ -4,6 +4,9 @@ Control your LinkedIn feed with an LLM of your choice. A chrome extension that f
 
 This prototype demonstrates how AI can empower us to have more control over the content we consume.
 
+> [!Feature Announcement]
+> 🎉 New: Mute Words feature added - automatically filter posts containing specific words!
+
 ## Demo
 
 ![Cringe Guard Demo Video](./images/demo-cringe-guard.gif)
@@ -32,10 +35,10 @@ To run the Cringe-Guard Chrome extension on your local machine, follow these ste
 - Select the folder where the extension files are located (`cringe-guard` folder).
 
 ## TODO
-- [ ] Refactor the codebase a bit
+- [x] Refactor the codebase a bit
 - [x] Allow users to input API key through a simple interface in popup.html.
 - [x] Provide users with the option to either blur or completely remove content from the DOM.
-- [ ] In addition to analyzing the text content of posts, automatically detect and remove posts with "Promoted" tags by default.
+- [x] In addition to analyzing the text content of posts, automatically detect and remove posts with "Promoted" tags by default.
 - [ ] Enable custom post filters, letting users choose which posts to show or hide via UI
 - [x] Persist user settings (API key and filters) using Chrome Storage API.
 - [ ] Test cross-browser compatibility
