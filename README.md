@@ -4,7 +4,7 @@ Control your LinkedIn feed with an LLM of your choice. A chrome extension that f
 
 This prototype demonstrates how AI can empower us to have more control over the content we consume.
 
-> [!Feature Announcement]
+> [!TIP]
 > 🎉 New: Mute Words feature added - automatically filter posts containing specific words!
 
 ## Demo
