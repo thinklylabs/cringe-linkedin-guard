@@ -80,7 +80,7 @@ function cringeGuardThisPost(post, filterMode) {
             postContainer.style.opacity = '0';
             postContainer.style.pointerEvents = 'none';
         }
-        console.log('[Cringe Guard] Post removed');
+        console.log('[Scroll Safe] Post removed');
         return;
     }
 
