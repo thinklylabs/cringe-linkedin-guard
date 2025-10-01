@@ -43,17 +43,20 @@
     }
 
     .logo-icon {
-      width: 20px;
-      height: 20px;
-      background: #22c55e;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
-    }
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-icon img {
+  width: 16px;   /* adjust size as needed */
+  height: 16px;
+  object-fit: contain;
+}
+
 
     .settings-icon {
       cursor: pointer;
@@ -337,6 +340,39 @@
     .remove-word-btn:hover {
       color: #ef4444;
     }
+    .show-words-container {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.show-words-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.show-word-tag {
+  background: #e5f5e8;
+  color: #065f46;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.show-empty-state {
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #e5e7eb;
+}
+
 
     .empty-state {
       text-align: center;
@@ -405,6 +441,129 @@
 .mute-input-container {
   position: relative;
 }
+/* Show Words Section */
+.show-words-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.show-words-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.show-words-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+.show-words-count {
+  font-size: 12px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.show-input-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.show-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.add-show-btn {
+  background: #22c55e;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.add-show-btn:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.shown-words-container {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.shown-words-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.show-word-tag {
+  background: #e5f5e8;
+  color: #065f46;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.clear-show-btn {
+  background: none;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.clear-show-btn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+.show-empty-state {
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #e5e7eb;
+}
+
+/* Optional: reuse hover effect for remove buttons if added later */
+.remove-show-btn {
+  background: none;
+  border: none;
+  color: #065f46;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.remove-show-btn:hover {
+  color: #dc2626;
+}
+
 
 .mute-select::after {
   content: '';
@@ -470,9 +629,12 @@
   <div class="container">
     <div class="header">
       <div class="logo">
-        <div class="logo-icon">CG</div>
-        Cringe Guard
-      </div>
+  <div class="logo-icon">
+    <img src="../images/thinkly.svg" alt="Cringe Guard" />
+  </div>
+  Cringe Guard
+</div>
+
       <svg class="settings-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"></circle>
@@ -530,89 +692,85 @@
         </div>
       </div>
 
-      <!-- mute words -->
-      <div class="mute-words-section">
-        <div class="mute-words-header">
-          <div class="mute-words-title">Mute Words</div>
-          <div class="mute-words-count" id="mute-count">0 words</div>
-        </div>
-        
-        <div class="mute-input-container">
-          <select class="mute-select" id="mute-select">
-            <option value="" disabled selected>Select word to mute...</option>
-           
-            <option value="free webinar">free webinar</option>
-            <option value="discount">discount</option>
-            <option value="disruptive">disruptive</option>
-            <option value="innovative">innovative</option>
-            <option value="like if">like if</option>
-            <option value="comment below">comment below</option>
-            <option value="share if">share if</option>
-            <option value="viral">viral</option>
-            <option value="must read">must read</option>
-            <option value="hustle">hustle</option>
-            <option value="grind">grind</option>
-            <option value="level up">level up</option>
-            <option value="mindset">mindset</option>
-            <option value="entrepreneur life">entrepreneur life</option>
-          </select>
-          <button class="add-select-btn" id="add-select-btn">Add</button>
-
-         
-        </div>
-
-        <div class="mute-input-container">
-          <input type="text" class="mute-input" id="mute-input" placeholder="Add word to mute..." maxlength="30">
-          <button class="add-word-btn" id="add-word-btn">Add</button>
-        </div>
-
-        <div class="muted-words-container" id="muted-words-container">
-          <div class="muted-words-list" id="muted-words-list"></div>
-          <div class="empty-state" id="empty-state">
-            No muted words yet
-          </div>
-          <button class="clear-all-btn" id="clear-all-btn" style="display: none;">
-            Clear All Words
-          </button>
-        </div>
-        <!-- show words -->
-
-
-      </div>
       <div class="mute-words-section">
   <div class="mute-words-header">
-    <div class="mute-words-title">Show Words</div>
-    <div class="mute-words-count" id="show-count">0 words</div>
-  </div>
-  
-  <div class="mute-input-container">
-    <select class="mute-select" id="show-select">
-      <option value="" disabled selected>Select word to highlight...</option>
-      <option value="career">career</option>
-      <option value="opportunity">opportunity</option>
-      <option value="growth">growth</option>
-      <option value="leadership">leadership</option>
-      <option value="success">success</option>
-      <option value="networking">networking</option>
-    </select>
-    <button class="add-select-btn" id="add-show-select-btn">Add</button>
+    <div class="mute-words-title">Mute Words</div>
+    <div class="mute-words-count" id="mute-count">0 words</div>
   </div>
 
+  <!-- Autocomplete input -->
   <div class="mute-input-container">
-    <input type="text" class="mute-input" id="show-input" placeholder="Add word to highlight..." maxlength="30">
-    <button class="add-word-btn" id="add-show-btn">Add</button>
+    <input type="text" class="mute-input" id="mute-input" placeholder="Add word to mute..." maxlength="30" list="mute-list">
+    <datalist id="mute-list">
+      <option value="free webinar"></option>
+      <option value="discount"></option>
+      <option value="disruptive"></option>
+      <option value="innovative"></option>
+      <option value="like if"></option>
+      <option value="comment below"></option>
+      <option value="share if"></option>
+      <option value="viral"></option>
+      <option value="must read"></option>
+      <option value="hustle"></option>
+      <option value="grind"></option>
+      <option value="level up"></option>
+      <option value="mindset"></option>
+      <option value="entrepreneur life"></option>
+    </datalist>
+    <button class="add-word-btn" id="add-word-btn">Add</button>
   </div>
 
-  <div class="muted-words-container" id="show-words-container">
-    <div class="muted-words-list" id="show-words-list"></div>
-    <div class="empty-state" id="show-empty-state">
-      No words to highlight yet
+  <div class="muted-words-container" id="muted-words-container">
+    <div class="muted-words-list" id="muted-words-list"></div>
+    <div class="empty-state" id="empty-state">
+      No muted words yet
     </div>
-    <button class="clear-all-btn" id="clear-show-all-btn" style="display: none;">
+    <button class="clear-all-btn" id="clear-all-btn" style="display: none;">
       Clear All Words
     </button>
   </div>
 </div>
+<div class="show-words-section">
+  <div class="show-words-header">
+    <div class="show-words-title">Show Words</div>
+    <div class="show-words-count" id="show-count">0 words</div>
+  </div>
+
+  <!-- Autocomplete input for show words -->
+  <div class="show-input-container">
+    <input type="text" class="show-input" id="show-input" placeholder="Add word to show..." maxlength="30" list="show-list">
+    <datalist id="show-list">
+      <option value="success"></option>
+      <option value="inspiring"></option>
+      <option value="achievement"></option>
+      <option value="growth"></option>
+      <option value="learn"></option>
+      <option value="win"></option>
+      <option value="goal"></option>
+      <option value="team"></option>
+      <option value="opportunity"></option>
+      <option value="celebrate"></option>
+      <option value="motivation"></option>
+      <option value="skill"></option>
+      <option value="knowledge"></option>
+      <option value="improve"></option>
+    </datalist>
+    <button class="add-show-btn" id="add-show-btn">Add</button>
+  </div>
+
+  <div class="shown-words-container" id="shown-words-container">
+    <div class="shown-words-list" id="shown-words-list"></div>
+    <div class="show-empty-state" id="show-empty-state">
+      No show words yet
+    </div>
+    <button class="clear-show-btn" id="clear-show-btn" style="display: none;">
+      Clear All Words
+    </button>
+  </div>
+</div>
+
+
+
     </div>
   </div>
   <script src="./../scripts/popup.js"></script>
