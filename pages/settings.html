@@ -46,18 +46,7 @@
       gap: 8px;
     }
 
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: #22c55e;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
-    }
+
 
     .settings-icon {
       cursor: pointer;
@@ -110,6 +99,22 @@
       display: block;
       margin-bottom: 8px;
     }
+     .logo-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-icon img {
+  width: 16px;   /* adjust size as needed */
+  height: 16px;
+  object-fit: contain;
+}
+
+
 
     .api-key-section input {
       padding: 10px 12px;
@@ -181,17 +186,17 @@
   <div class="container">
     <div class="header">
       <div class="logo">
-        <div class="logo-icon">CG</div>
-        Cringe Guard - Settings
-      </div>
-      <svg class="settings-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path
-          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-        </path>
-      </svg>
+        <div class="logo-icon">
+    <img src="../images/thinkly.svg" alt="Cringe Guard" />
+  </div>
+  Cringe Guard
+</div>
+  
     </div>
+        <div class="description" style="margin-top: 12px; font-weight: 500;">
+Liked this tool? We help founders grow their LinkedIn visibility. <a href="https://www.thinklylabs.com/" target="_blank" style="color:#22c55e; text-decoration:underline;">Learn more</a>
+</div>
+    
 
    <div class="card">
   <h2>Gemini API Key</h2>
@@ -200,9 +205,8 @@
       To get your Gemini API key, follow these steps:
     </p>
     <ol>
-      <li>Sign up or log in to your <a href="https://aistudio.google.com/api-keys" target="_blank">Google Cloud account</a>.</li>
+      <li>Sign up or log in to your <a href="https://aistudio.google.com/api-keys" target="_blank">AI Studio</a>.</li>
       <li>Create a new project or select an existing one.</li>
-      <li>Enable the Vertex AI / Gemini API in the API Library.</li>
       <li>Generate a new API key and copy it.</li>
       <li>Paste the key in the field below and click "Save".</li>
     </ol>
