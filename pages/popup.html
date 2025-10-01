@@ -2,606 +2,619 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cringe Guard - filter out cringe content using AI, in realtime.</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #0077b5;
-            color: #1f2937;
-            width: 320px;
-            height: auto;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cringe Guard - filter out cringe content using AI, in realtime.</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #111827;
+      width: 340px;
+      height: auto;
+      overflow: hidden;
+    }
 
-        .container {
-            padding: 16px;
-            height: 100%;
-            overflow-y: auto;
-        }
+    .container {
+      padding: 16px;
+      height: 100%;
+      overflow-y: auto;
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 12px;
-            border-radius: 8px;
-            position: sticky;
-            top: 0;
-            backdrop-filter: blur(8px);
-        }
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-        .logo {
-            font-size: 18px;
-            font-weight: 600;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .logo-icon {
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0077b5;
-            font-weight: bold;
-            font-size: 14px;
-        }
+    .logo-icon {
+      width: 20px;
+      height: 20px;
+      background: #22c55e;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
 
-        .settings-icon {
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 50%;
-            transition: all 0.2s;
-            color: white;
-        }
+    .settings-icon {
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 50%;
+      transition: all 0.2s;
+      color: #374151;
+    }
 
-        .settings-icon:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: rotate(30deg);
-        }
+    .settings-icon:hover {
+      background-color: #f3f4f6;
+    }
 
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 12px;
-        }
+    /* Card */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 16px;
+    }
 
-        .toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
+    /* Toggle Section */
+    .toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
 
-        .toggle span {
-            font-weight: bold;
-            color: #0077b5;
-        }
+    .toggle span {
+      font-weight: 600;
+      color: #111827;
+    }
 
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 22px;
-        }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
 
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #e5e7eb;
-            transition: .3s;
-            border-radius: 34px;
-        }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #e5e7eb;
+      transition: .3s;
+      border-radius: 34px;
+    }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
-        }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
 
-        input:checked+.slider {
-            background: #0077b5;
-        }
+    input:checked+.slider {
+      background: #22c55e;
+    }
 
-        input:checked+.slider:before {
-            transform: translateX(18px);
-        }
+    input:checked+.slider:before {
+      transform: translateX(18px);
+    }
 
-        .stats {
-            font-size: 13px;
-            color: #666;
-            line-height: 1.6;
-            display: flex;
-            justify-content: space-between;
-            background: #f1f6f9;
-            padding: 8px 12px;
-            border-radius: 6px;
-        }
+    /* Stats */
+    .stats {
+      font-size: 13px;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      background: #f9fafb;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
 
-        .stat-item {
-            text-align: center;
-        }
+    .stat-item {
+      text-align: center;
+    }
 
-        .stat-value {
-            color: #0077b5;
-            font-weight: 600;
-            font-size: 16px;
-            display: block;
-        }
+    .stat-value {
+      color: #111827;
+      font-weight: 700;
+      font-size: 16px;
+      display: block;
+    }
 
-        .filtered-content {
-            background: #f8fafc;
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 12px;
-            font-size: 13px;
-            color: #64748b;
-        }
+    /* Filter Mode */
+    .filter-mode {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+    }
 
-        .content-title {
-            font-weight: 500;
-            color: #0077b5;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .filter-mode-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #111827;
+    }
 
-        .post-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .toggle-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
 
-        .post-item:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
-        }
+    .toggle-slider {
+      position: relative;
+      width: 200px;
+      height: 40px;
+      background: #f3f4f6;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-        .shield-icon {
-            color: #0077b5;
-            opacity: 0.8;
-        }
+    .toggle-option {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      color: #6b7280;
+      font-weight: 600;
+      font-size: 14px;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
 
-        .refresh-button {
-            background: none;
-            border: none;
-            color: #0077b5;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
+    .toggle-slider.blur #blur-option {
+      color: white;
+    }
 
-        .refresh-button:hover {
-            background: #e1f0f7;
-        }
+    .toggle-slider.remove #remove-option {
+      color: white;
+    }
 
-        .error-card {
-            background: #fee2e2;
-            border: 1px solid #ef4444;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #dc2626;
-        }
+    .toggle-slider-button {
+      position: absolute;
+      width: 50%;
+      height: 34px;
+      border-radius: 17px;
+      background: #22c55e;
+      left: 3px;
+      top: 3px;
+      transition: all 0.3s;
+    }
 
-        .error-card svg {
-            flex-shrink: 0;
-        }
+    .toggle-slider.remove .toggle-slider-button {
+      left: calc(50% - 3px);
+    }
 
-        .filter-mode {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e5e7eb;
-        }
+    .mode-description {
+      font-size: 12px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 8px;
+      min-height: 30px;
+    }
 
-        .filter-mode-title {
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: #0077b5;
-        }
+    /* Mute Words Section */
+    .mute-words-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e7eb;
+    }
 
-        .toggle-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
+    .mute-words-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
 
-        .toggle-slider {
-            position: relative;
-            width: 200px;
-            height: 40px;
-            background: #f1f6f9;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+    .mute-words-title {
+      font-weight: 600;
+      color: #111827;
+    }
 
-        .toggle-option {
-            flex: 1;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-            color: #64748b;
-            font-weight: 600;
-            font-size: 14px;
-            gap: 6px;
-            transition: all 0.3s ease;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-        }
+    .mute-words-count {
+      font-size: 12px;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
 
-        .toggle-slider.blur #blur-option {
-            color: white;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        }
+    .mute-input-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
 
-        .toggle-slider.remove #remove-option {
-            color: white;
-            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-        }
+    .mute-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 13px;
+    }
 
-        .toggle-slider-button {
-            position: absolute;
-            width: 50%;
-            height: 34px;
-            border-radius: 17px;
-            background: #0077b5;
-            left: 3px;
-            top: 3px;
-            transition: all 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 0;
-        }
+    .add-word-btn {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
 
-        .toggle-slider.remove .toggle-slider-button {
-            left: calc(50% - 3px);
-        }
+    .add-word-btn:hover {
+      background: #16a34a;
+    }
 
-        .mode-description {
-            font-size: 12px;
-            color: #64748b;
-            text-align: center;
-            margin-top: 8px;
-            min-height: 30px;
-        }
+    .add-select-btn {
+      background: #22c55e;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
 
-        .toggle-option svg {
-            stroke-width: 2.5;
-        }
+    .add-select-btn:hover {
+      background: #16a34a;
+    }
 
-        /* Mute Words Section */
-        .mute-words-section {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e5e7eb;
-        }
+    .muted-words-container {
+      max-height: 120px;
+      overflow-y: auto;
+    }
 
-        .mute-words-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
+    .muted-words-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
 
-        .mute-words-title {
-            font-weight: bold;
-            color: #0077b5;
-        }
+    .muted-word-tag {
+      background: #f3f4f6;
+      color: #111827;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .mute-words-count {
-            font-size: 12px;
-            color: #64748b;
-            background: #f1f6f9;
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
+    .remove-word-btn {
+      background: none;
+      border: none;
+      color: #6b7280;
+      cursor: pointer;
+      font-size: 12px;
+    }
 
-        .mute-input-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-        }
+    .remove-word-btn:hover {
+      color: #ef4444;
+    }
 
-        .mute-input {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
+    .empty-state {
+      text-align: center;
+      color: #6b7280;
+      font-size: 12px;
+      padding: 16px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border: 1px dashed #e5e7eb;
+    }
 
-        .mute-input:focus {
-            border-color: #0077b5;
-            box-shadow: 0 0 0 2px rgba(0, 119, 181, 0.1);
-        }
+    .clear-all-btn {
+      background: none;
+      border: 1px solid #e5e7eb;
+      color: #6b7280;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 8px;
+      width: 100%;
+    }
 
-        .add-word-btn {
-            background: #0077b5;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+    .clear-all-btn:hover {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #dc2626;
+    }
 
-        .add-word-btn:hover {
-            background: #004182;
-        }
+    /* Error card */
+    .error-card {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #b91c1c;
+    }
+    /* Mute Words Dropdown UI Enhancement */
+.mute-select {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13px;
+  background-color: #f9fafb;
+  color: #111827;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
 
-        .add-word-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
+.mute-select:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  outline: none;
+}
 
-        .muted-words-container {
-            max-height: 120px;
-            overflow-y: auto;
-            padding: 2px;
-        }
+/* Add dropdown arrow */
+.mute-input-container {
+  position: relative;
+}
 
-        .muted-words-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
+.mute-select::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #6b7280;
+  transform: translateY(-50%);
+}
 
-        .muted-word-tag {
-            background: #f1f6f9;
-            color: #0077b5;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid #e1f0f7;
-            transition: all 0.2s;
-        }
+/* Adjust spacing between dropdown and input */
+.mute-input-container:first-of-type {
+  margin-bottom: 12px;
+}
 
-        .muted-word-tag:hover {
-            background: #e1f0f7;
-            transform: translateY(-1px);
-        }
+/* Hover effect for dropdown options */
+.mute-select option {
+  padding: 8px;
+}
 
-        .remove-word-btn {
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            padding: 2px;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
+/* Optional: improve Add button */
+.add-word-btn {
+  transition: all 0.2s ease;
+}
 
-        .remove-word-btn:hover {
-            background: #ef4444;
-            color: white;
-        }
+.add-word-btn:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-        .empty-state {
-            text-align: center;
-            color: #64748b;
-            font-size: 12px;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 6px;
-            border: 1px dashed #e5e7eb;
-        }
+/* Muted words list card improvement */
+.muted-word-tag {
+  background: #e5f5e8;
+  color: #065f46;
+  font-weight: 600;
+}
 
-        .clear-all-btn {
-            background: none;
-            border: 1px solid #e5e7eb;
-            color: #64748b;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
-            margin-top: 8px;
-            width: 100%;
-        }
+.remove-word-btn {
+  color: #065f46;
+}
 
-        .clear-all-btn:hover {
-            background: #fee2e2;
-            border-color: #ef4444;
-            color: #dc2626;
-        }
+.remove-word-btn:hover {
+  color: #dc2626;
+}
 
-        .muted-words-container::-webkit-scrollbar {
-            width: 4px;
-        }
+/* Clear all button hover */
+.clear-all-btn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #b91c1c;
+}
 
-        .muted-words-container::-webkit-scrollbar-track {
-            background: #f1f6f9;
-            border-radius: 2px;
-        }
-
-        .muted-words-container::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 2px;
-        }
-
-        .muted-words-container::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-    </style>
+  </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon">CG</div>
-                Cringe Guard
-            </div>
-            <svg class="settings-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path
-                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                </path>
-            </svg>
-        </div>
-
-        <!-- error card if api key not found -->
-        <div class="error-card">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            Add your Groq API key in settings
-        </div>
-
-        <div class="card">
-            <div class="toggle">
-                <span class="toggle-label">Filter LinkedIn Feed</span>
-                <label class="switch">
-                    <input type="checkbox" id="toggle-switch">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="stats">
-                <div class="stat-item">
-                    <span class="stat-value" id="cringe-count">0</span>
-                    Cringe Dodged
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value" id="time-saved">0m</span>
-                    Time Saved
-                </div>
-            </div>
-
-            <div class="filter-mode">
-                <div class="filter-mode-title">Filter Mode</div>
-                <div class="toggle-container">
-                    <div class="toggle-slider">
-                        <div class="toggle-option" id="blur-option">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M8 9l-5 5"></path>
-                                <path d="M16 9l5 5"></path>
-                                <path d="M9 16l-5 -5"></path>
-                                <path d="M14 16l5 -5"></path>
-                            </svg>
-                            <span>Blur</span>
-                        </div>
-                        <div class="toggle-option" id="remove-option">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                            </svg>
-                            <span>Vanish</span>
-                        </div>
-                        <div class="toggle-slider-button"></div>
-                    </div>
-                </div>
-                <div class="mode-description" id="mode-description">
-                    Blurs cringe until you decide
-                </div>
-            </div>
-
-            <!-- Mute Words Section -->
-            <div class="mute-words-section">
-                <div class="mute-words-header">
-                    <div class="mute-words-title">Mute Words</div>
-                    <div class="mute-words-count" id="mute-count">0 words</div>
-                </div>
-
-                <div class="mute-input-container">
-                    <input type="text" class="mute-input" id="mute-input" placeholder="Add word to mute..."
-                        maxlength="30">
-                    <button class="add-word-btn" id="add-word-btn">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Add
-                    </button>
-                </div>
-
-                <div class="muted-words-container" id="muted-words-container">
-                    <div class="muted-words-list" id="muted-words-list"></div>
-                    <div class="empty-state" id="empty-state">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.5" style="margin-bottom: 8px; opacity: 0.5;">
-                            <path d="M9 12l2 2 4-4" />
-                            <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
-                        </svg>
-                        <div>No muted words yet</div>
-                        <div style="margin-top: 4px; font-size: 11px; opacity: 0.7;">Add words to automatically filter
-                            posts</div>
-                    </div>
-                    <button class="clear-all-btn" id="clear-all-btn" style="display: none;">
-                        Clear All Words
-                    </button>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <div class="logo-icon">CG</div>
+        Cringe Guard
+      </div>
+      <svg class="settings-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+        </path>
+      </svg>
     </div>
 
-    <script src="./../scripts/popup.js"></script>
-</body>
+    <!-- error card -->
+    <div class="error-card">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      Add your Gemini API key in settings
+    </div>
 
+    <!-- your popup content (unchanged structure, themed styles) -->
+    <div class="card">
+      <div class="toggle">
+        <span class="toggle-label">Filter LinkedIn Feed</span>
+        <label class="switch">
+          <input type="checkbox" id="toggle-switch">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-value" id="cringe-count">0</span>
+          Cringe Dodged
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="time-saved">0m</span>
+          Time Saved
+        </div>
+      </div>
+
+      <div class="filter-mode">
+        <div class="filter-mode-title">Filter Mode</div>
+        <div class="toggle-container">
+          <div class="toggle-slider">
+            <div class="toggle-option" id="blur-option">
+              <span>Blur</span>
+            </div>
+            <div class="toggle-option" id="remove-option">
+              <span>Vanish</span>
+            </div>
+            <div class="toggle-slider-button"></div>
+          </div>
+        </div>
+        <div class="mode-description" id="mode-description">
+          Blurs cringe until you decide
+        </div>
+      </div>
+
+      <!-- mute words -->
+      <div class="mute-words-section">
+        <div class="mute-words-header">
+          <div class="mute-words-title">Mute Words</div>
+          <div class="mute-words-count" id="mute-count">0 words</div>
+        </div>
+        
+        <div class="mute-input-container">
+          <select class="mute-select" id="mute-select">
+            <option value="" disabled selected>Select word to mute...</option>
+           
+            <option value="free webinar">free webinar</option>
+            <option value="discount">discount</option>
+            <option value="disruptive">disruptive</option>
+            <option value="innovative">innovative</option>
+            <option value="like if">like if</option>
+            <option value="comment below">comment below</option>
+            <option value="share if">share if</option>
+            <option value="viral">viral</option>
+            <option value="must read">must read</option>
+            <option value="hustle">hustle</option>
+            <option value="grind">grind</option>
+            <option value="level up">level up</option>
+            <option value="mindset">mindset</option>
+            <option value="entrepreneur life">entrepreneur life</option>
+          </select>
+          <button class="add-select-btn" id="add-select-btn">Add</button>
+
+         
+        </div>
+
+        <div class="mute-input-container">
+          <input type="text" class="mute-input" id="mute-input" placeholder="Add word to mute..." maxlength="30">
+          <button class="add-word-btn" id="add-word-btn">Add</button>
+        </div>
+
+        <div class="muted-words-container" id="muted-words-container">
+          <div class="muted-words-list" id="muted-words-list"></div>
+          <div class="empty-state" id="empty-state">
+            No muted words yet
+          </div>
+          <button class="clear-all-btn" id="clear-all-btn" style="display: none;">
+            Clear All Words
+          </button>
+        </div>
+        <!-- show words -->
+
+
+      </div>
+      <div class="mute-words-section">
+  <div class="mute-words-header">
+    <div class="mute-words-title">Show Words</div>
+    <div class="mute-words-count" id="show-count">0 words</div>
+  </div>
+  
+  <div class="mute-input-container">
+    <select class="mute-select" id="show-select">
+      <option value="" disabled selected>Select word to highlight...</option>
+      <option value="career">career</option>
+      <option value="opportunity">opportunity</option>
+      <option value="growth">growth</option>
+      <option value="leadership">leadership</option>
+      <option value="success">success</option>
+      <option value="networking">networking</option>
+    </select>
+    <button class="add-select-btn" id="add-show-select-btn">Add</button>
+  </div>
+
+  <div class="mute-input-container">
+    <input type="text" class="mute-input" id="show-input" placeholder="Add word to highlight..." maxlength="30">
+    <button class="add-word-btn" id="add-show-btn">Add</button>
+  </div>
+
+  <div class="muted-words-container" id="show-words-container">
+    <div class="muted-words-list" id="show-words-list"></div>
+    <div class="empty-state" id="show-empty-state">
+      No words to highlight yet
+    </div>
+    <button class="clear-all-btn" id="clear-show-all-btn" style="display: none;">
+      Clear All Words
+    </button>
+  </div>
+</div>
+    </div>
+  </div>
+  <script src="./../scripts/popup.js"></script>
+</body>
 </html>

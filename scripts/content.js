@@ -1,10 +1,12 @@
+// ==================== Utility Functions ====================
+
 function getApiKeyIfEnabled() {
     return new Promise((resolve) => {
-        chrome.storage.sync.get(["groqApiKey", "isEnabled"], (data) => {
-            if (data.isEnabled && data.groqApiKey) {
-                resolve(data.groqApiKey);
+        chrome.storage.sync.get(["geminiApiKey", "isEnabled"], (data) => {
+            if (data.isEnabled && data.geminiApiKey) {
+                resolve(data.geminiApiKey);
             } else {
-                console.warn("GROQ API key not found or extension is disabled.");
+                console.warn("Gemini API key not found or extension is disabled.");
                 resolve(null);
             }
         });
@@ -19,11 +21,18 @@ function getMutedWords() {
     });
 }
 
-function containsMutedWords(text, mutedWords) {
-    if (!mutedWords || mutedWords.length === 0) return false;
+function getShowWords() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get(["showWords"], (data) => {
+            resolve(data.showWords || []);
+        });
+    });
+}
 
+function containsWords(text, words) {
+    if (!words || words.length === 0) return false;
     const lowerText = text.toLowerCase();
-    return mutedWords.some(word => lowerText.includes(word.toLowerCase()));
+    return words.some(word => lowerText.includes(word.toLowerCase()));
 }
 
 function debounce(func, wait) {
@@ -38,258 +47,191 @@ function debounce(func, wait) {
     };
 }
 
-async function initExtension() {
-    const apiKey = await getApiKeyIfEnabled();
-    if (!apiKey) {
-        console.warn("GROQ API key not found. Please set your API key in the extension settings.");
-        return; // Stop execution if no API key
-    }
-
-    cringeGuardExistingPosts();
-    observeNewPosts();
-}
-
 function estimateTimeSavedInSeconds(postText) {
     const wordCount = postText.split(/\s+/).length;
-
-    if (wordCount <= 20) return 5;   // Short posts (~5 sec saved)
-    if (wordCount <= 50) return 10;  // Medium posts (~10 sec saved)
-    return 20;                       // Long posts (~20 sec saved)
+    if (wordCount <= 20) return 5;
+    if (wordCount <= 50) return 10;
+    return 20;
 }
 
 function updateCringeStats(postText) {
     chrome.storage.sync.get(["cringeCount", "timeSavedInMinutes"], (data) => {
         const newCount = (data.cringeCount || 0) + 1;
-        const estimatedTimeSavedInSeconds = estimateTimeSavedInSeconds(postText);
-
-        const newTimeSavedInMinutes = parseFloat(data.timeSavedInMinutes || 0) + estimatedTimeSavedInSeconds / 60; // Convert to minutes
-
+        const newTimeSavedInMinutes = parseFloat(data.timeSavedInMinutes || 0) + estimateTimeSavedInSeconds(postText) / 60;
         chrome.storage.sync.set({ cringeCount: newCount, timeSavedInMinutes: newTimeSavedInMinutes });
     });
 }
 
+// ==================== Post Filtering ====================
+
 function cringeGuardThisPost(post, filterMode) {
     const parentDiv = post.closest('.feed-shared-update-v2__control-menu-container');
+    if (!parentDiv) return;
 
-    if (parentDiv) {
-        // completely hiding the post from DOM if filterMode is 'remove'
-        if (filterMode === 'remove') { // TODO - refactor is needed here.
-            const postContainer = parentDiv.closest('.feed-shared-update-v2');
-
-            if (postContainer) {
-                postContainer.style.display = 'none';
-                postContainer.style.visibility = 'hidden';
-                postContainer.style.height = '0';
-                postContainer.style.overflow = 'hidden';
-                postContainer.style.margin = '0';
-                postContainer.style.padding = '0';
-                postContainer.style.opacity = '0';
-                postContainer.style.pointerEvents = 'none'; // Prevents interaction
-            }
-            console.log('[Cringe Guard] Post removed');
-            return;
+    if (filterMode === 'remove') {
+        const postContainer = parentDiv.closest('.feed-shared-update-v2');
+        if (postContainer) {
+            postContainer.style.display = 'none';
+            postContainer.style.visibility = 'hidden';
+            postContainer.style.height = '0';
+            postContainer.style.overflow = 'hidden';
+            postContainer.style.margin = '0';
+            postContainer.style.padding = '0';
+            postContainer.style.opacity = '0';
+            postContainer.style.pointerEvents = 'none';
         }
-        const wrapper = document.createElement('div');
-        while (parentDiv.firstChild) {
-            wrapper.appendChild(parentDiv.firstChild);
-        }
-
-        wrapper.style.filter = 'blur(10px)';
-        wrapper.style.transition = 'all 0.3s ease';
-        wrapper.style.width = '100%';
-        wrapper.style.height = '100%';
-        wrapper.style.position = 'relative';
-        wrapper.style.opacity = '0.95';
-
-        parentDiv.style.position = 'relative';
-
-        const button = document.createElement('button');
-        button.innerText = 'Click to View';
-        button.style.position = 'absolute';
-        button.style.top = '50%';
-        button.style.left = '50%';
-        button.style.transform = 'translate(-50%, -50%)';
-        button.style.zIndex = '10';
-        button.style.backgroundColor = '#0a66c2';
-        button.style.color = 'white';
-        button.style.border = 'none';
-        button.style.padding = '12px 24px';
-        button.style.fontSize = '14px';
-        button.style.borderRadius = '24px';
-        button.style.cursor = 'pointer';
-        button.style.fontWeight = '600';
-        button.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-        button.style.transition = 'all 0.2s ease';
-
-        button.onmouseover = () => {
-            button.style.backgroundColor = '#004182';
-            button.style.boxShadow = '0 0 12px rgba(0,0,0,0.15)';
-        };
-
-        button.onmouseout = () => {
-            button.style.backgroundColor = '#0a66c2';
-            button.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-        };
-
-        button.addEventListener('click', () => {
-            wrapper.style.filter = '';
-            wrapper.style.opacity = '1';
-            button.style.display = 'none';
-        });
-
-        parentDiv.appendChild(wrapper);
-        parentDiv.appendChild(button);
+        console.log('[Cringe Guard] Post removed');
+        return;
     }
+
+    // Blur effect
+    const wrapper = document.createElement('div');
+    while (parentDiv.firstChild) wrapper.appendChild(parentDiv.firstChild);
+    wrapper.style.filter = 'blur(10px)';
+    wrapper.style.transition = 'all 0.3s ease';
+    wrapper.style.width = '100%';
+    wrapper.style.height = '100%';
+    wrapper.style.position = 'relative';
+    wrapper.style.opacity = '0.95';
+    parentDiv.style.position = 'relative';
+
+    const button = document.createElement('button');
+    button.innerText = 'Click to View';
+    button.style.cssText = `
+        position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+        z-index:10; background-color:#0a66c2; color:white; border:none;
+        padding:12px 24px; font-size:14px; border-radius:24px;
+        cursor:pointer; font-weight:600; box-shadow:0 0 10px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+    `;
+    button.onmouseover = () => { button.style.backgroundColor = '#004182'; button.style.boxShadow = '0 0 12px rgba(0,0,0,0.15)'; };
+    button.onmouseout = () => { button.style.backgroundColor = '#0a66c2'; button.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)'; };
+    button.addEventListener('click', () => { wrapper.style.filter=''; wrapper.style.opacity='1'; button.style.display='none'; });
+
+    parentDiv.appendChild(wrapper);
+    parentDiv.appendChild(button);
 }
 
+// ==================== Cringe Detection ====================
+
 async function checkForCringe({ actorName, actorDescription, actorSubDescription, postContent }) {
-    // Cringe Rule: 0 - No Promoted Posts.
-    if (actorDescription.toLowerCase().includes('promoted') || actorSubDescription.toLowerCase().includes('promoted')) {
-        return true;
-    }
+    // 0. Promoted posts
+    if (actorDescription.toLowerCase().includes('promoted') || actorSubDescription.toLowerCase().includes('promoted')) return true;
 
-    // Cringe Rule: 1 - Contains muted words.
+    // 1. Muted words
     const mutedWords = await getMutedWords();
-    if (containsMutedWords(actorName, mutedWords) || containsMutedWords(actorDescription, mutedWords) || containsMutedWords(actorSubDescription, mutedWords) || containsMutedWords(postContent, mutedWords)) {
-        return true;
-    }
+    if (containsWords(actorName, mutedWords) || containsWords(actorDescription, mutedWords) || containsWords(actorSubDescription, mutedWords) || containsWords(postContent, mutedWords)) return true;
 
-    const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+    // 2. Show words whitelist
+    const showWords = await getShowWords();
+    if (containsWords(postContent, showWords)) return false; // explicitly allow post
+
+    // 3. Gemini API check
     const apiKey = await getApiKeyIfEnabled();
-    if (!apiKey) return; // Stop execution if no API key
+    if (!apiKey) return false;
 
-    const SYSTEM_PROMPT_PREFIX = `
-        You are a LinkedIn post analyzer. Your job is to determine if a post meets the following criteria:
-    `;
-
-    const POST_CRITERIA = `
-        - Selling a course, and using some emotional unrelated story
-        - Overly emotional or clickbait stories with no tech-related content
-        - Using "life lessons" or motivational quotes that aren't tied to personal growth in tech or learning.
-        - Non-tech political or social commentary that doesn’t add value to professional discussions
-        - Posts that are purely personal (vacations, family pictures) without a professional context
-        - asking to "Comment 'interested' if you want to get the job!"
-        - "Tag 3 people" or "like if you agree" with no substance or tech-related discussions
-        - Generalized or redundant content
-        - Any brand promotional content / Ad
-        - Overly generic advice like "Keep learning every day" without mentioning any specific tools, frameworks, or learning paths.
-        - Anything that’s just a viral meme or random content not related to a professional or technical goal.
-        - Written by an LLM
-        - Overly personal or TMI content
-        - Excessive self-promotion or bragging
+    const GEMINI_API_URL = 'https://genai.googleapis.com/v1beta2/models/gemini-2.5-flash:generateText';
+    const SYSTEM_PROMPT = `
+        You are a LinkedIn post analyzer. Determine if a post is cringe based on these criteria:
+        - Selling a course with unrelated emotional story
+        - Overly emotional or clickbait stories with no tech content
+        - Motivational quotes not tied to tech growth
+        - Non-tech political/social commentary
+        - Purely personal content without professional context
+        - Posts asking to comment/tag/like with no substance
+        - Generalized/redundant content
+        - Brand promotional content/ads
+        - Overly generic advice without specifics
+        - Viral memes unrelated to professional goals
+        - Written by an AI
+        - Overly personal/TMI content
+        - Excessive self-promotion/bragging
         - Inappropriate workplace behavior
-        - Forced or artificial inspiration
+        - Forced/artificial inspiration
         - Obvious humble bragging
-        - Inappropriate emotional display for professional setting
-        - Contains misleading or out-of-context information
+        - Misleading or out-of-context info
     `;
-
-    const prompt = `${SYSTEM_PROMPT_PREFIX} ${POST_CRITERIA}
-        If any of the above criteria are met, the post should be considered as a cringe post.`;
 
     try {
-        const response = await fetch(GROQ_API_URL, {
+        const response = await fetch(GEMINI_API_URL, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: "gemma2-9b-it",
-                messages: [
-                    { role: "system", content: prompt },
-                    { role: "user", content: "Linkedin Post:\n\n" + postContent + "\n\nVery briefly list if the post matches any of the defined cringe criteria. If none, conclude with POST_IS_NOT_CRINGE otherwise POST_IS_CRINGE." }
-                ],
-                temperature: 0.1 // Lowering temperature for more consistent responses
-            })
+            headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: SYSTEM_PROMPT, inputs: [postContent], temperature: 0.1 })
         });
-
         const data = await response.json();
-        if(data.error) {
-            return false; // If there's an error, we skip
-        }
-
-        const isCringe = data.choices[0].message.content.toLowerCase().includes('post_is_cringe');
-        return isCringe;
+        if (data.error) { console.error('Gemini API Error:', data.error); return false; }
+        return data.predictions[0].output.toLowerCase().includes('post_is_cringe');
     } catch (error) {
         console.error('Error checking post:', error);
         return false;
     }
 }
 
+// ==================== Post Processing ====================
+
 const alreadyProcessedPosts = new Set();
+
 async function processPost(post) {
     const commentaryElement = post.querySelector('.update-components-update-v2__commentary');
-    if (commentaryElement && !alreadyProcessedPosts.has(commentaryElement)) {
-        alreadyProcessedPosts.add(commentaryElement);
-        const actorContainer = post.querySelector('.update-components-actor__container');
+    if (!commentaryElement || alreadyProcessedPosts.has(commentaryElement)) return;
+    alreadyProcessedPosts.add(commentaryElement);
 
-        // Post metadata
-        let actorName = 'Unknown';
-        let actorDescription = 'No description';
-        let actorSubDescription = 'No sub-description';
+    const actorContainer = post.querySelector('.update-components-actor__container');
+    let actorName = 'Unknown', actorDescription = 'No description', actorSubDescription = 'No sub-description';
 
-        if (actorContainer) {
-            const nameElement = actorContainer.querySelector('.update-components-actor__title .KGgIHqzHPPknyAatueAITVWiujbQjSvZMsjyU span[aria-hidden="true"]');
-            if (nameElement) {
-                actorName = nameElement.textContent.trim();
-            }
+    if (actorContainer) {
+        const nameEl = actorContainer.querySelector('.update-components-actor__title span[aria-hidden="true"]');
+        const descEl = actorContainer.querySelector('.update-components-actor__description span[aria-hidden="true"]');
+        const subDescEl = actorContainer.querySelector('.update-components-actor__sub-description span[aria-hidden="true"]');
+        if (nameEl) actorName = nameEl.textContent.trim();
+        if (descEl) actorDescription = descEl.textContent.trim();
+        if (subDescEl) actorSubDescription = subDescEl.textContent.trim();
+    }
 
-            const descriptionElement = actorContainer.querySelector('.update-components-actor__description span[aria-hidden="true"]');
-            if (descriptionElement) {
-                actorDescription = descriptionElement.textContent.trim();
-            }
+    const isCringe = await checkForCringe({
+        actorName,
+        actorDescription,
+        actorSubDescription,
+        postContent: commentaryElement.innerText.trim(),
+    });
 
-            const subDescriptionElement = actorContainer.querySelector('.update-components-actor__sub-description span[aria-hidden="true"]');
-            if (subDescriptionElement) {
-                actorSubDescription = subDescriptionElement.textContent.trim();
-            }
-        }
-
-        const isCringe = await checkForCringe({
-            actorName,
-            actorDescription,
-            actorSubDescription,
-            postContent: commentaryElement.innerText.trim(),
+    if (isCringe) {
+        const { filterMode } = await new Promise(resolve => {
+            chrome.storage.sync.get(['filterMode'], data => resolve({ filterMode: data.filterMode || 'blur' }));
         });
-
-        if (isCringe) {
-            const { filterMode } = await new Promise(resolve => {
-                chrome.storage.sync.get(['filterMode'], data => {
-                    resolve({ filterMode: data.filterMode || 'blur' }); // Defaulting to 'blur' if not set
-                });
-            });
-
-            cringeGuardThisPost(post, filterMode);
-            updateCringeStats(post.innerText);
-        }
+        cringeGuardThisPost(post, filterMode);
+        updateCringeStats(post.innerText);
     }
 }
 
+// ==================== DOM Observation ====================
+
 function cringeGuardExistingPosts() {
-    const posts = document.querySelectorAll('.feed-shared-update-v2__control-menu-container');
-    for (const post of posts) {
-        processPost(post);
-    }
+    document.querySelectorAll('.feed-shared-update-v2__control-menu-container').forEach(processPost);
 }
 
 function observeNewPosts() {
     const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
+        mutations.forEach(mutation => {
             if (mutation.type === 'childList') {
-                mutation.addedNodes.forEach((node) => {
+                mutation.addedNodes.forEach(node => {
                     if (node.nodeType === Node.ELEMENT_NODE) {
-                        const postContainers = node.querySelectorAll('.feed-shared-update-v2__control-menu-container');
-                        postContainers.forEach((postContainer) => {
-                            processPost(postContainer);
-                        })
+                        node.querySelectorAll('.feed-shared-update-v2__control-menu-container').forEach(processPost);
                     }
                 });
             }
         });
     });
-
     observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// ==================== Initialization ====================
+
+async function initExtension() {
+    const apiKey = await getApiKeyIfEnabled();
+    if (!apiKey) return console.warn("Gemini API key not found. Set it in extension settings.");
+    cringeGuardExistingPosts();
+    observeNewPosts();
 }
 
 initExtension();

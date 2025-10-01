@@ -14,9 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelector(".api-key-section").appendChild(successMessage);
 
     // Load API key from Chrome storage
-    chrome.storage.sync.get("groqApiKey", function (data) {
-        if (data.groqApiKey) {
-            apiKeyInput.value = data.groqApiKey;
+    chrome.storage.sync.get("geminiApiKey", function (data) {
+        if (data.geminiApiKey) {
+            apiKeyInput.value = data.geminiApiKey;
         }
     });
 
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const apiKey = apiKeyInput.value.trim();
         if (!apiKey) return;
 
-        chrome.storage.sync.set({ groqApiKey: apiKey }, function () {
+        chrome.storage.sync.set({ geminiApiKey: apiKey }, function () {
             successMessage.style.display = "block";
             successMessage.style.opacity = "1";
 
