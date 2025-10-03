@@ -123,8 +123,8 @@ async function checkForCringe({ actorName, actorDescription, actorSubDescription
     if (containsWords(actorName, mutedWords) || containsWords(actorDescription, mutedWords) || containsWords(actorSubDescription, mutedWords) || containsWords(postContent, mutedWords)) return true;
 
     // 2. Show words whitelist
-    const showWords = await getShowWords();
-    if (containsWords(postContent, showWords)) return false; // explicitly allow post
+    // const showWords = await getShowWords();
+    // if (containsWords(postContent, showWords)) return false; // explicitly allow post
 
     // 3. Gemini API check
     const apiKey = await getApiKeyIfEnabled();

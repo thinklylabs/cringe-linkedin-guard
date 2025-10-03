@@ -15,10 +15,10 @@
         }
     ],
     "icons": {
-        "16": "./images/thinkly.svg",
-        "32": "./images/thinkly.svg",
-        "48": "./images/thinkly.svg",
-        "128": "./images/thinkly.svg"
+        "16": "./images/image.png",
+        "32": "./images/image.png",
+        "48": "./images/image.png",
+        "128": "./images/image.png"
     },
     "action": {
         "default_popup": "./pages/popup.html",
